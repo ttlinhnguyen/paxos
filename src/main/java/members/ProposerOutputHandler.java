@@ -5,8 +5,9 @@ import messages.*;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
+import java.util.concurrent.Callable;
 
-public class ProposerOutputHandler implements Runnable {
+class ProposerOutputHandler implements Callable<Boolean> {
     int TIMEOUT = 10*1000;
     Proposer proposer;
     int proposalId;
@@ -16,8 +17,8 @@ public class ProposerOutputHandler implements Runnable {
     }
 
     @Override
-    public void run() {
-        prepare();
+    public Boolean call() {
+        return prepare();
     }
 
     private void getNewProposalId() {
@@ -28,37 +29,62 @@ public class ProposerOutputHandler implements Runnable {
         proposer.promisedOutStream.put(proposalId, new ArrayList<>());
     }
 
-    private void prepare() {
-        try {
+    private boolean prepare() {
+        if (!proposer.decided) {
+            try {
+//                Thread.sleep(proposer.delay);
+                getNewProposalId();
+                Message request = new Prepare(proposalId);
+                System.out.println(proposer.UUID + " PREPARE " + proposalId);
+
+                for (ObjectOutputStream outputStream : proposer.acceptorsOutStream) {
+                    outputStream.writeObject(request);
+                }
+                return handlePromise();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return false;
+    }
+
+    private boolean requestAccept() throws IOException, InterruptedException {
+        if (!proposer.decided) {
             Thread.sleep(proposer.delay);
-            getNewProposalId();
-            Message request = new Prepare(proposalId);
-            System.out.println(proposer.UUID + " PREPARE " + proposalId);
+            Message request = new RequestAccept(proposalId, proposalValue);
+            System.out.println(proposer.UUID + " SEND_ACCEPT " + proposalId + " " + proposalValue);
+
             for (ObjectOutputStream outputStream : proposer.acceptorsOutStream) {
                 outputStream.writeObject(request);
             }
-            handlePromise();
-        } catch (Exception e) {
-            e.printStackTrace();
+            return handleAccept();
         }
+        return false;
     }
 
-    private void sendAccept() throws IOException, InterruptedException {
-        Thread.sleep(proposer.delay);
-        Message request = new SendAccept(proposalId, proposalValue);
-        System.out.println(proposer.UUID + " SEND_ACCEPT " + proposalId);
-
-        for (ObjectOutputStream outputStream : proposer.promisedOutStream.get(proposalId)) {
-            outputStream.writeObject(request);
+    private boolean decide() throws InterruptedException, IOException {
+        if (!proposer.decided) {
+            Thread.sleep(proposer.delay);
+            Message request = new Decide(proposalId, proposalValue);
+            System.out.println(proposer.UUID + " DECIDE " + proposalId + " " + proposalValue);
+            proposer.decide(proposalId, proposalValue);
+            for (ObjectOutputStream outputStream : proposer.acceptorsOutStream) {
+                outputStream.writeObject(request);
+            }
+            return true;
         }
-        handleAccept();
+        return false;
     }
 
-    private void handlePromise() {
+    private boolean handlePromise() {
+        // promise to self
+        int majorityTarget =  proposer.promise(proposalId) ? proposer.numAcceptors/2 - 1 : proposer.numAcceptors/2;
+
         long startTime = System.currentTimeMillis();
-        while (System.currentTimeMillis() - startTime < TIMEOUT) {
+        while (notTimeout(startTime)) {
             try {
-                if (proposer.promised.get(proposalId).size() >= proposer.numAcceptors/2) {
+                if (proposer.decided) return false;
+                if (proposer.promised.get(proposalId).size() >= majorityTarget) {
                     startTime = System.currentTimeMillis();
                     int highestAcceptedId = -1;
                     proposalValue = proposer.UUID;
@@ -69,29 +95,35 @@ public class ProposerOutputHandler implements Runnable {
                             proposalValue = m.acceptedValue;
                         }
                     }
-                    sendAccept();
-                    return;
+                    return requestAccept();
+
                 }
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
+            } catch (Exception e) {}
         }
-        prepare();
+        return prepare();
     }
 
-    private void handleAccept() {
-        long startTime = System.currentTimeMillis();
-        while (System.currentTimeMillis() - startTime < TIMEOUT) {
-            if (proposer.accepted.get(proposalId).size() >= proposer.numAcceptors/2) {
-                startTime = System.currentTimeMillis();
-                // majority has accepted
-                System.out.println("Majority has accepted Proposal " + proposalId + ": " + proposalValue +
-                        " from Member " + proposer.UUID);
-                return;
-            }
-        }
+    private boolean handleAccept() {
+        // accept to self
+        int majorityTarget = proposer.accept(proposalId, proposalValue) ? proposer.numAcceptors/2 - 1 : proposer.numAcceptors/2;
 
+        long startTime = System.currentTimeMillis();
+        while (notTimeout(startTime)) {
+            try {
+                if (proposer.decided) return false;
+                if (proposer.accepted.get(proposalId).size() >= majorityTarget) {
+                    startTime = System.currentTimeMillis();
+                    // majority has accepted
+                    System.out.println("Majority has accepted Proposal " + proposalId + ": " + proposalValue +
+                            " from Member " + proposer.UUID);
+                    return decide();
+                }
+            } catch (Exception e) {}
+        }
+        return false;
+    }
+
+    private boolean notTimeout(long startTime) {
+        return System.currentTimeMillis() - startTime < TIMEOUT;
     }
 }

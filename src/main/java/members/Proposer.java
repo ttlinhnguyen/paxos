@@ -8,6 +8,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.concurrent.Future;
 
 public class Proposer extends Acceptor {
     static LamportClock clock = new LamportClock();
@@ -33,21 +34,21 @@ public class Proposer extends Acceptor {
         }
     }
 
-    public void propose() {
-        new Thread(new ProposerOutputHandler(this)).start();
+    public Future<Boolean> propose() {
+        return threadPool.submit(new ProposerOutputHandler(this));
     }
 
 
     private void listen(Proposer proposer) {
-        new Thread(() -> {
+        threadPool.execute(() -> {
             while (running) {
                 try {
                     Socket acceptorSocket = serverSocket.accept();
                     acceptorsOutStream.add(new ObjectOutputStream(acceptorSocket.getOutputStream()));
-                    new Thread(new ProposerInputHandler(proposer, acceptorSocket)).start();
+                    threadPool.submit(new ProposerInputHandler(proposer, acceptorSocket));
                 } catch (IOException e) {}
             }
-        }).start();
+        });
     }
 
 }

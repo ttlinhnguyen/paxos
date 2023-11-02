@@ -1,6 +1,6 @@
 package members;
 
-public class LamportClock {
+class LamportClock {
     int time = 0;
     public LamportClock() {}
     public synchronized void increment() { time++; }

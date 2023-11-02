@@ -7,7 +7,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 
-public class AcceptorInputHandler implements Runnable {
+class AcceptorInputHandler implements Runnable {
     Acceptor acceptor;
     Socket socket;
     ObjectOutputStream outputStream;
@@ -25,47 +25,45 @@ public class AcceptorInputHandler implements Runnable {
             while (acceptor.running) {
                 try {
                     Thread.sleep(acceptor.delay);
-                    socket.setSoTimeout(5000);
+                    socket.setSoTimeout(1000);
                     Message request = (Message) inputStream.readObject();
+                    socket.setSoTimeout(0); // to prevent the effect of thread sleep
                     if (request.type.equals(MessageType.PREPARE)) promise((Prepare) request);
-                    else if (request.type.equals(MessageType.SEND_ACCEPT)) accept((SendAccept) request);
-                } catch (IOException e) {
-                }
+                    else if (request.type.equals(MessageType.REQUEST_ACCEPT)) accept((RequestAccept) request);
+                    else if (request.type.equals(MessageType.DECIDE)) decide((Decide) request);
+                } catch (IOException e) {}
             }
-//        } catch (IOException e) {}
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public void promise(Prepare request) throws IOException {
-        if (request.proposalId >= acceptor.highestPromiseId) {
-            acceptor.highestPromiseId = request.proposalId;
-
+    private void promise(Prepare request) throws IOException {
+        if (acceptor.promise(request.proposalId)) {
             Message response = new Promise(request.proposalId);
             if (acceptor.acceptedId !=-1) {
                 response = new Promise(request.proposalId, acceptor.acceptedId, acceptor.acceptedValue);
             }
-
-            System.out.println(acceptor.UUID + " PROMISE " + acceptor.highestPromiseId);
-
             outputStream.writeObject(response);
-//            outputStream.flush();
+
+            System.out.println(acceptor.UUID + " PROMISE " + request.proposalId);
         }
 
     }
-    public void accept(SendAccept request) throws IOException {
-        if (request.proposalId >= acceptor.highestPromiseId) {
-            acceptor.highestPromiseId = request.proposalId;
-            acceptor.acceptedId = acceptor.highestPromiseId;
-            acceptor.acceptedValue = request.proposalValue;
-
+    private void accept(RequestAccept request) throws IOException {
+        if (acceptor.accept(request.proposalId, request.proposalValue)) {
             Message response = new Accept(acceptor.acceptedId);
+            outputStream.writeObject(response);
 
             System.out.println(acceptor.UUID + " ACCEPT " + acceptor.acceptedId);
 
-            outputStream.writeObject(response);
-//            outputStream.flush();
         }
+    }
+
+    private void decide(Decide request) {
+        try {
+            socket.close();
+        } catch (IOException e) {}
+        acceptor.decide(request.id, request.value);
     }
 }

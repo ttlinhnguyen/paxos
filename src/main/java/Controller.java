@@ -1,8 +1,9 @@
 import members.Acceptor;
 import members.Proposer;
 
-import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.concurrent.Future;
 
 public class Controller {
     HashMap<Integer, Acceptor> acceptors; // ID: members.Acceptor
@@ -12,8 +13,16 @@ public class Controller {
         proposers = builder.proposers;
     }
 
-    public void propose(int id) {
-        proposers.get(id).propose();
+    public Future<Boolean> propose(int id) {
+        return proposers.get(id).propose();
+//        proposers.get(id).propose();
+//        new Thread(new Runnable() {
+//            @Override
+//            public void run() {
+//                proposers.get(id).propose();
+//            }
+//        }).start();
+//        return null;
     }
     public void stopAll() {
         for (Acceptor acceptor : acceptors.values()) {
@@ -21,10 +30,18 @@ public class Controller {
         }
     }
 
+    public HashMap<Integer, Acceptor> getAcceptors() { return acceptors; }
+
     public static class DefaultController {
+        Integer[] delays = {0, 300, 150, 50, 100, 150, 200, 250, 300};
         public DefaultController() {}
+        public DefaultController(Integer[] delays) {
+            this.delays = delays;
+        }
+        public DefaultController(int delay) {
+            Arrays.fill(delays, delay);
+        }
         public Controller build() {
-            Integer[] delays = {0, 200, 400, 50, 100, 150, 200, 250, 300};
             ControllerBuilder builder = new ControllerBuilder(9, 1000);
             for (int i=1; i<10; i++) {
                 if (i<4) builder = builder.addProposer(i, delays[i-1]);

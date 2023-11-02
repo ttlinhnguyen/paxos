@@ -5,14 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="6aad671c-fc88-471e-b111-597d36990cfd" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Makefile" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/MainStimulator.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/CentralisedController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Controller.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/members/Proposer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/members/Proposer.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/members/ProposerInputHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/members/ProposerInputHandler.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/members/ProposerOutputHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/members/ProposerOutputHandler.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/Test.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/Test.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/Controller.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Controller.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -73,7 +67,7 @@
       <option name="presentableId" value="Default" />
       <updated>1697689644494</updated>
       <workItem from="1697689645393" duration="6000" />
-      <workItem from="1698725266560" duration="34277000" />
+      <workItem from="1698725266560" duration="35249000" />
     </task>
     <servers />
   </component>

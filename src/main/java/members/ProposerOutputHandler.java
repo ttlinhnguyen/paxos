@@ -25,7 +25,7 @@ public class ProposerOutputHandler implements Runnable {
         proposalId = Proposer.clock.get();
         proposer.promised.put(proposalId, new ArrayList<>());
         proposer.accepted.put(proposalId, new ArrayList<>());
-//        proposer.promisedOutStream.put(proposalId, new ArrayList<>());
+        proposer.promisedOutStream.put(proposalId, new ArrayList<>());
     }
 
     private void prepare() {
@@ -36,7 +36,6 @@ public class ProposerOutputHandler implements Runnable {
             System.out.println(proposer.UUID + " PREPARE " + proposalId);
             for (ObjectOutputStream outputStream : proposer.acceptorsOutStream) {
                 outputStream.writeObject(request);
-//                outputStream.flush();
             }
             handlePromise();
         } catch (Exception e) {
@@ -47,12 +46,10 @@ public class ProposerOutputHandler implements Runnable {
     private void sendAccept() throws IOException, InterruptedException {
         Thread.sleep(proposer.delay);
         Message request = new SendAccept(proposalId, proposalValue);
-//        request.value = proposalValue;
         System.out.println(proposer.UUID + " SEND_ACCEPT " + proposalId);
 
-        for (ObjectOutputStream outputStream : proposer.acceptorsOutStream) {
+        for (ObjectOutputStream outputStream : proposer.promisedOutStream.get(proposalId)) {
             outputStream.writeObject(request);
-//            outputStream.flush();
         }
         handleAccept();
     }

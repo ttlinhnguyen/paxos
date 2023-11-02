@@ -16,7 +16,7 @@ public class Proposer extends Acceptor {
     HashMap<Integer, ArrayList<Accept>> accepted = new HashMap<>();
 
     ArrayList<ObjectOutputStream> acceptorsOutStream = new ArrayList<>();
-//    HashMap<Integer, ArrayList<ObjectOutputStream>> promisedOutStream = new HashMap<>();
+    HashMap<Integer, ArrayList<ObjectOutputStream>> promisedOutStream = new HashMap<>();
     public Proposer(int uuid, int port, int delay, int numAcceptors) {
         super(uuid, port, delay);
         this.numAcceptors = numAcceptors;

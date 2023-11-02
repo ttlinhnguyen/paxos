@@ -56,9 +56,4 @@ public class Acceptor implements Runnable {
         new Thread(new AcceptorInputHandler(this, socket)).start();
     }
 
-//    public synchronized int getHighestPromiseId() { return highestPromiseId; }
-//    public synchronized void updateHighestPromiseId(int val) { highestPromiseId = val; }
-//    public synchronized int getAcceptedId() { return acceptedId; }
-//    public synchronized void updateAcceptId(int val) { acceptedId = val; }
-
 }

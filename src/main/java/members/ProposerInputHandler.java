@@ -4,6 +4,7 @@ import messages.*;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.Socket;
 
 public class ProposerInputHandler implements Runnable {
@@ -36,7 +37,7 @@ public class ProposerInputHandler implements Runnable {
 
     private void receivePromise(Promise message) throws IOException {
         proposer.promised.get(message.proposalId).add(message);
-//        proposer.promisedOutStream.get(message.proposalId).add(new ObjectOutputStream(acceptorSocket.getOutputStream()));
+        proposer.promisedOutStream.get(message.proposalId).add(new ObjectOutputStream(acceptorSocket.getOutputStream()));
     }
     private void receiveAccept(Accept message) {
         proposer.accepted.get(message.acceptedId).add(message);

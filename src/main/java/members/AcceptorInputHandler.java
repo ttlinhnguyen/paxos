@@ -12,6 +12,13 @@ class AcceptorInputHandler implements Runnable {
     Socket socket;
     ObjectOutputStream outputStream;
     ObjectInputStream inputStream;
+
+    /**
+     * Responsible for listening to messages from a certain proposer and responding correspondingly.
+     * @param acceptor An acceptor
+     * @param socket An acceptor's socket connection to a certain proposer
+     * @throws IOException I/O Exception in the output stream and input stream
+     */
     public AcceptorInputHandler(Acceptor acceptor, Socket socket) throws IOException {
         this.acceptor = acceptor;
         this.socket = socket;
@@ -24,13 +31,15 @@ class AcceptorInputHandler implements Runnable {
         try {
             while (acceptor.running) {
                 try {
-                    Thread.sleep(acceptor.delay);
                     socket.setSoTimeout(1000);
                     Message request = (Message) inputStream.readObject();
-                    socket.setSoTimeout(0); // to prevent the effect of thread sleep
-                    if (request.type.equals(MessageType.PREPARE)) promise((Prepare) request);
-                    else if (request.type.equals(MessageType.REQUEST_ACCEPT)) accept((RequestAccept) request);
-                    else if (request.type.equals(MessageType.DECIDE)) decide((Decide) request);
+                    socket.setSoTimeout(0);
+                    Thread.sleep(acceptor.delay);
+                    try {
+                        if (request.type.equals(MessageType.PREPARE)) promise((Prepare) request);
+                        else if (request.type.equals(MessageType.REQUEST_ACCEPT)) accept((RequestAccept) request);
+                        else if (request.type.equals(MessageType.DECIDE)) decide((Decide) request);
+                    } catch (Exception e) {}
                 } catch (IOException e) {}
             }
         } catch (Exception e) {
@@ -46,7 +55,7 @@ class AcceptorInputHandler implements Runnable {
             }
             outputStream.writeObject(response);
 
-            System.out.println(acceptor.UUID + " PROMISE " + request.proposalId);
+            acceptor.debug(acceptor.UUID + " PROMISE ID: " + request.proposalId);
         }
 
     }
@@ -55,7 +64,7 @@ class AcceptorInputHandler implements Runnable {
             Message response = new Accept(acceptor.acceptedId);
             outputStream.writeObject(response);
 
-            System.out.println(acceptor.UUID + " ACCEPT " + acceptor.acceptedId);
+            acceptor.debug(acceptor.UUID + " ACCEPT ID: " + acceptor.acceptedId);
 
         }
     }

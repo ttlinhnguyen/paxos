@@ -5,17 +5,14 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="6aad671c-fc88-471e-b111-597d36990cfd" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/src/main/java/messages/Decide.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/Controller.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Controller.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/members/Acceptor.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/members/Acceptor.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/members/AcceptorInputHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/members/AcceptorInputHandler.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/members/LamportClock.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/members/LamportClock.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/members/Proposer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/members/Proposer.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/members/ProposerInputHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/members/ProposerInputHandler.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/members/ProposerOutputHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/members/ProposerOutputHandler.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/messages/MessageType.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/messages/MessageType.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/messages/SendAccept.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/messages/RequestAccept.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/test/java/Test.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/Test.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -36,9 +33,9 @@
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
   </component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "associatedIndex": 4
-}]]></component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 4
+}</component>
   <component name="ProjectId" id="2Wy0j2SGDNCqeOne9TTm25GZZBR" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true">
     <ConfirmationsSetting value="2" id="Add" />
@@ -47,22 +44,24 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "WebServerToolWindowFactoryState": "false",
-    "git-widget-placeholder": "main",
-    "last_opened_file_path": "/Users/linhnguyen/Desktop/S2-2023/DS/A3/Paxos",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/Users/linhnguyen/Desktop/S2-2023/DS/A3/Paxos&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;run.code.analysis.last.selected.profile&quot;: &quot;pProject Default&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;editor.preferences.gutterIcons&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="MoveClassesOrPackagesDialog.RECENTS_KEY">
       <recent name="" />
@@ -77,12 +76,24 @@
       <option name="presentableId" value="Default" />
       <updated>1697689644494</updated>
       <workItem from="1697689645393" duration="6000" />
-      <workItem from="1698725266560" duration="44362000" />
+      <workItem from="1698725266560" duration="58325000" />
+      <workItem from="1699489349854" duration="9633000" />
     </task>
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

@@ -4,7 +4,6 @@ import messages.*;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.net.Socket;
 
 class ProposerInputHandler implements Runnable {
@@ -17,7 +16,6 @@ class ProposerInputHandler implements Runnable {
 
     @Override
     public void run() {
-
         try {
             ObjectInputStream inputStream = new ObjectInputStream(acceptorSocket.getInputStream());
             while (proposer.running) {
@@ -36,10 +34,14 @@ class ProposerInputHandler implements Runnable {
 
 
     private void receivePromise(Promise message) throws IOException {
-        proposer.promised.get(message.proposalId).add(message);
-//        proposer.promisedOutStream.get(message.proposalId).add(new ObjectOutputStream(acceptorSocket.getOutputStream()));
+        try {
+            proposer.lock.acquire();
+            proposer.promisedMap.get(message.proposalId).add(message);
+            proposer.promisedSockets.get(message.proposalId).add(acceptorSocket);
+            proposer.lock.release();
+        } catch (InterruptedException ignored) {}
     }
     private void receiveAccept(Accept message) {
-        proposer.accepted.get(message.acceptedId).add(message);
+        proposer.acceptedMap.get(message.acceptedId).add(message);
     }
 }

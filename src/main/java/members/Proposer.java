@@ -11,16 +11,18 @@ import java.util.HashMap;
 import java.util.concurrent.Future;
 
 public class Proposer extends Acceptor {
-    static LamportClock clock = new LamportClock();
+    LamportClock clock;
+//    static LamportClock clock = new LamportClock();
     int numAcceptors;
-    HashMap<Integer, ArrayList<Promise>> promised = new HashMap<>();
-    HashMap<Integer, ArrayList<Accept>> accepted = new HashMap<>();
+    HashMap<Integer, ArrayList<Promise>> promisedMap = new HashMap<>();
+    HashMap<Integer, ArrayList<Accept>> acceptedMap = new HashMap<>();
 
-    ArrayList<ObjectOutputStream> acceptorsOutStream = new ArrayList<>();
-    HashMap<Integer, ArrayList<ObjectOutputStream>> promisedOutStream = new HashMap<>();
-    public Proposer(int uuid, int port, int delay, int numAcceptors) {
+    HashMap<Socket ,ObjectOutputStream> acceptorsOutStream = new HashMap<>();
+    HashMap<Integer, ArrayList<Socket>> promisedSockets = new HashMap<>();
+    public Proposer(int uuid, int port, int delay, int numAcceptors, LamportClock clock) {
         super(uuid, port, delay);
         this.numAcceptors = numAcceptors;
+        this.clock = clock;
     }
 
     @Override
@@ -28,7 +30,6 @@ public class Proposer extends Acceptor {
         try {
             serverSocket = new ServerSocket(port);
             listen(this);
-
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -40,11 +41,11 @@ public class Proposer extends Acceptor {
 
 
     private void listen(Proposer proposer) {
-        threadPool.execute(() -> {
+        threadPool.submit(() -> {
             while (running) {
                 try {
                     Socket acceptorSocket = serverSocket.accept();
-                    acceptorsOutStream.add(new ObjectOutputStream(acceptorSocket.getOutputStream()));
+                    acceptorsOutStream.put(acceptorSocket, new ObjectOutputStream(acceptorSocket.getOutputStream()));
                     threadPool.submit(new ProposerInputHandler(proposer, acceptorSocket));
                 } catch (IOException e) {}
             }

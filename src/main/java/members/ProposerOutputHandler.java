@@ -2,13 +2,13 @@ package members;
 
 import messages.*;
 
-import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.net.Socket;
 import java.util.ArrayList;
 import java.util.concurrent.Callable;
 
 class ProposerOutputHandler implements Callable<Boolean> {
-    int TIMEOUT = 10*1000;
+    int TIMEOUT = 5*1000;
     Proposer proposer;
     int proposalId;
     int proposalValue;
@@ -18,57 +18,61 @@ class ProposerOutputHandler implements Callable<Boolean> {
 
     @Override
     public Boolean call() {
-        return prepare();
+        try {
+            return prepare();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private void getNewProposalId() {
-        Proposer.clock.increment();
-        proposalId = Proposer.clock.get();
-        proposer.promised.put(proposalId, new ArrayList<>());
-        proposer.accepted.put(proposalId, new ArrayList<>());
-        proposer.promisedOutStream.put(proposalId, new ArrayList<>());
+        proposer.clock.increment();
+        proposalId = proposer.clock.get();
+        proposer.promisedMap.put(proposalId, new ArrayList<>());
+        proposer.acceptedMap.put(proposalId, new ArrayList<>());
+        proposer.promisedSockets.put(proposalId, new ArrayList<>());
     }
 
-    private boolean prepare() {
-        if (!proposer.decided) {
-            try {
-//                Thread.sleep(proposer.delay);
-                getNewProposalId();
-                Message request = new Prepare(proposalId);
-                System.out.println(proposer.UUID + " PREPARE " + proposalId);
+    private boolean prepare() throws Exception {
+        if (!proposer.accepted && proposer.running) {
+            getNewProposalId();
+            Message request = new Prepare(proposalId);
+            proposer.debug(proposer.UUID + " PREPARE ID: " + proposalId);
 
-                for (ObjectOutputStream outputStream : proposer.acceptorsOutStream) {
-                    outputStream.writeObject(request);
-                }
-                return handlePromise();
-            } catch (Exception e) {
-                e.printStackTrace();
+            for (ObjectOutputStream outputStream : proposer.acceptorsOutStream.values()) {
+                outputStream.writeObject(request);
             }
+            return handlePromise();
         }
         return false;
     }
 
-    private boolean requestAccept() throws IOException, InterruptedException {
-        if (!proposer.decided) {
+    private boolean requestAccept() throws Exception {
+        if (!proposer.accepted && proposer.running) {
             Thread.sleep(proposer.delay);
             Message request = new RequestAccept(proposalId, proposalValue);
-            System.out.println(proposer.UUID + " SEND_ACCEPT " + proposalId + " " + proposalValue);
+            proposer.debug(proposer.UUID + " SEND_ACCEPT ID: " + proposalId + " VALUE: " + proposalValue);
 
-            for (ObjectOutputStream outputStream : proposer.acceptorsOutStream) {
-                outputStream.writeObject(request);
-            }
+            try {
+                proposer.lock.acquire();
+                for (Socket socket : proposer.promisedSockets.get(proposalId)) {
+                    ObjectOutputStream outputStream = proposer.acceptorsOutStream.get(socket);
+                    outputStream.writeObject(request);
+                }
+                proposer.lock.release();
+            } catch (InterruptedException e) {}
             return handleAccept();
         }
         return false;
     }
 
-    private boolean decide() throws InterruptedException, IOException {
-        if (!proposer.decided) {
+    private boolean decide() throws Exception {
+        if (proposer.running) {
             Thread.sleep(proposer.delay);
             Message request = new Decide(proposalId, proposalValue);
-            System.out.println(proposer.UUID + " DECIDE " + proposalId + " " + proposalValue);
+            proposer.debug(proposer.UUID + " DECIDE ID: " + proposalId + " VALUE: " + proposalValue);
             proposer.decide(proposalId, proposalValue);
-            for (ObjectOutputStream outputStream : proposer.acceptorsOutStream) {
+            for (ObjectOutputStream outputStream : proposer.acceptorsOutStream.values()) {
                 outputStream.writeObject(request);
             }
             return true;
@@ -76,49 +80,38 @@ class ProposerOutputHandler implements Callable<Boolean> {
         return false;
     }
 
-    private boolean handlePromise() {
+    private boolean handlePromise() throws Exception {
         // promise to self
-        int majorityTarget =  proposer.promise(proposalId) ? proposer.numAcceptors/2 - 1 : proposer.numAcceptors/2;
+        int majorityTarget =  proposer.promise(proposalId) ? proposer.numAcceptors/2 : proposer.numAcceptors/2+1;
 
         long startTime = System.currentTimeMillis();
-        while (notTimeout(startTime)) {
-            try {
-                if (proposer.decided) return false;
-                if (proposer.promised.get(proposalId).size() >= majorityTarget) {
-                    startTime = System.currentTimeMillis();
-                    int highestAcceptedId = -1;
-                    proposalValue = proposer.UUID;
+        while (notTimeout(startTime) && proposer.running) {
+            if (proposer.accepted) return false;
+            if (proposer.promisedMap.get(proposalId).size() >= majorityTarget) {
+                int highestAcceptedId = -1;
+                proposalValue = proposer.UUID;
 
-                    for (Promise m : proposer.promised.get(proposalId)) {
-                        if (m.acceptedId > highestAcceptedId) {
-                            highestAcceptedId = m.acceptedId;
-                            proposalValue = m.acceptedValue;
-                        }
+                for (Promise m : proposer.promisedMap.get(proposalId)) {
+                    if (m.acceptedId > highestAcceptedId) {
+                        highestAcceptedId = m.acceptedId;
+                        proposalValue = m.acceptedValue;
                     }
-                    return requestAccept();
-
                 }
-            } catch (Exception e) {}
+                return requestAccept();
+            }
         }
         return prepare();
     }
 
-    private boolean handleAccept() {
+    private boolean handleAccept() throws Exception {
         // accept to self
-        int majorityTarget = proposer.accept(proposalId, proposalValue) ? proposer.numAcceptors/2 - 1 : proposer.numAcceptors/2;
+        int majorityTarget = proposer.accept(proposalId, proposalValue) ? proposer.numAcceptors/2 : proposer.numAcceptors/2+1;
 
         long startTime = System.currentTimeMillis();
-        while (notTimeout(startTime)) {
-            try {
-                if (proposer.decided) return false;
-                if (proposer.accepted.get(proposalId).size() >= majorityTarget) {
-                    startTime = System.currentTimeMillis();
-                    // majority has accepted
-                    System.out.println("Majority has accepted Proposal " + proposalId + ": " + proposalValue +
-                            " from Member " + proposer.UUID);
-                    return decide();
-                }
-            } catch (Exception e) {}
+        while (notTimeout(startTime) && proposer.running) {
+            if (proposer.acceptedMap.get(proposalId).size() >= majorityTarget) {
+                return decide();
+            }
         }
         return false;
     }

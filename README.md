@@ -82,7 +82,7 @@ The test also prints the message log of the Proposers and Acceptors in the forma
 ## How to run
 ```shell
 # Compile all files
-make comile
+make compile
 
 # Run testing
 make tests

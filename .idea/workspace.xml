@@ -4,16 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6aad671c-fc88-471e-b111-597d36990cfd" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/members/Acceptor.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/members/Acceptor.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/members/AcceptorInputHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/members/AcceptorInputHandler.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/members/Proposer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/members/Proposer.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/members/ProposerInputHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/members/ProposerInputHandler.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/members/ProposerOutputHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/members/ProposerOutputHandler.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/Test.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/Test.java" afterDir="false" />
-    </list>
+    <list default="true" id="6aad671c-fc88-471e-b111-597d36990cfd" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -76,7 +67,7 @@
       <updated>1697689644494</updated>
       <workItem from="1697689645393" duration="6000" />
       <workItem from="1698725266560" duration="58325000" />
-      <workItem from="1699489349854" duration="13629000" />
+      <workItem from="1699489349854" duration="14546000" />
     </task>
     <servers />
   </component>

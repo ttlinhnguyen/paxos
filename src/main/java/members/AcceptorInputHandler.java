@@ -6,6 +6,9 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 class AcceptorInputHandler implements Runnable {
     Acceptor acceptor;
@@ -37,12 +40,15 @@ class AcceptorInputHandler implements Runnable {
                     socket.setSoTimeout(1000);
                     Message request = (Message) inputStream.readObject();
                     socket.setSoTimeout(0);
-                    Thread.sleep(acceptor.delay);
-                    try {
-                        if (request.type.equals(MessageType.PREPARE)) promise((Prepare) request);
-                        else if (request.type.equals(MessageType.REQUEST_ACCEPT)) accept((RequestAccept) request);
-                        else if (request.type.equals(MessageType.DECIDE)) decide((Decide) request);
-                    } catch (Exception e) {}
+                    new Thread(() -> {
+                        try {
+                            Thread.sleep(acceptor.delay);
+                            if (request.type.equals(MessageType.PREPARE)) promise((Prepare) request);
+                            else if (request.type.equals(MessageType.REQUEST_ACCEPT)) accept((RequestAccept) request);
+                            else if (request.type.equals(MessageType.DECIDE)) decide((Decide) request);
+                        } catch (Exception e) {
+                        }
+                    }).start();
                 } catch (IOException e) {}
             }
         } catch (Exception e) {
@@ -85,7 +91,7 @@ class AcceptorInputHandler implements Runnable {
      * Set the accepted ID and value to the ID and value that are decided across other members.
      * @param request The DECIDE message from the Proposer
      */
-    private void decide(Decide request) {
+    private void decide(Decide request) throws InterruptedException {
         try {
             socket.close();
         } catch (IOException e) {}

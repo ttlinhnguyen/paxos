@@ -3,7 +3,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 public class Test {
-    int TIMEOUT = 30000;
+    int TIMEOUT = 20000;
     private Boolean onePropose() {
         try {
             Controller controller = new Controller.DefaultController().build();

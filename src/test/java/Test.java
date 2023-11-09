@@ -72,35 +72,32 @@ public class Test {
 
     public static void main(String[] args) {
         Test t = new Test();
-//        new TestBuilder()
-//                .setName("Only Member 1 proposes.")
-//                .setExpected("All members vote for Member 1")
-//                .setTest(t::onePropose)
-//                .run();
-//        new TestBuilder()
-//                .setName("Member 1 and 2 propose simultaneously.")
-//                .setExpected("All members vote for either Member 1 and 2 based on the ID of their proposals.")
-//                .setTest(t::concurrentProposes)
-//                .run();
-//        new TestBuilder()
-//                .setName("All members have no delays in response time. Member 1 and 2 propose simultaneously.")
-//                .setExpected("All members vote for either Member 1 and 2 based on the ID of their proposals.")
-//                .setTest(t::immediateResponse)
-//                .run();
-//        new TestBuilder()
-//                .setName("Member 2 proposes but then crashes after 100ms. Member 1 proposes after 1s.")
-//                .setExpected("All members vote for Member 1")
-//                .setTest(t::proposerCrash)
-//                .run();
+        new TestBuilder()
+                .setName("Only Member 1 proposes.")
+                .setExpected("All members vote for Member 1")
+                .setTest(t::onePropose)
+                .run();
+        new TestBuilder()
+                .setName("Member 1 and 2 propose simultaneously.")
+                .setExpected("All members vote for either Member 1 and 2 based on the ID of their proposals.")
+                .setTest(t::concurrentProposes)
+                .run();
+        new TestBuilder()
+                .setName("All members have no delays in response time. Member 1 and 2 propose simultaneously.")
+                .setExpected("All members vote for either Member 1 and 2 based on the ID of their proposals.")
+                .setTest(t::immediateResponse)
+                .run();
+        new TestBuilder()
+                .setName("Member 2 proposes but then crashes after 100ms. Member 1 proposes after 1s.")
+                .setExpected("All members vote for Member 1")
+                .setTest(t::proposerCrash)
+                .run();
         new TestBuilder()
                 .setName("Member 1, 2, and 3 proposes simultaneously. After 100ms, Member 2 goes offline for 2s, " +
                         "and Member 3 goes offline for 3 seconds.")
                 .setExpected("All members vote for Member 1")
                 .setTest(t::twoProposersOffline)
                 .run();
-
-
-
     }
 
     public static class TestBuilder {

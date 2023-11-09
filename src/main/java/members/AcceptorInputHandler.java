@@ -26,6 +26,9 @@ class AcceptorInputHandler implements Runnable {
         inputStream = new ObjectInputStream(socket.getInputStream());
     }
 
+    /**
+     * While it's not stopped, listen to and handle incoming messages.
+     */
     @Override
     public void run() {
         try {
@@ -47,6 +50,10 @@ class AcceptorInputHandler implements Runnable {
         }
     }
 
+    /**
+     * If the acceptor promises on the proposed ID, send a PROMISE message back to the Proposer.
+     * @param request The PREPARE message from the Proposer
+     */
     private void promise(Prepare request) throws IOException {
         if (acceptor.promise(request.proposalId)) {
             Message response = new Promise(request.proposalId);
@@ -59,6 +66,11 @@ class AcceptorInputHandler implements Runnable {
         }
 
     }
+
+    /**
+     * If the acceptor accepts the proposed ID, send an ACCEPT message back to the Proposer.
+     * @param request The REQUEST_ACCEPT message from the Proposer
+     */
     private void accept(RequestAccept request) throws IOException {
         if (acceptor.accept(request.proposalId, request.proposalValue)) {
             Message response = new Accept(acceptor.acceptedId);
@@ -69,6 +81,10 @@ class AcceptorInputHandler implements Runnable {
         }
     }
 
+    /**
+     * Set the accepted ID and value to the ID and value that are decided across other members.
+     * @param request The DECIDE message from the Proposer
+     */
     private void decide(Decide request) {
         try {
             socket.close();

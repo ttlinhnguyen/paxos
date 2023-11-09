@@ -76,11 +76,50 @@ with others, including:
 * The Proposer crashes after sending the proposal.
 * Three members send the proposals, then two of them go offline.
 
+The test also prints the message log of the Proposers and Acceptors in the format of:
+`<UUID> <MessageType> ID: <id> VALUE: <value>`
+
 ## How to run
-```
-// Compile all files
+```shell
+# Compile all files
 make comile
 
-// Run testing
+# Run testing
 make tests
 ```
+
+## More in depth
+The `Controller` has a set of Acceptors and Proposers, which are made from class
+`Acceptor` and `Proposer`. 
+
+The Acceptors and Proposers communicate with each other
+via socket using the `Message` object. There are five types of message - 
+Proposers send PREPARE, REQUEST_ACCEPT, and DECIDE messages, while Acceptors
+send PROMISE and ACCEPT messages.
+### Acceptor
+When the Acceptor is asked to connect to a Proposer, it creates a thread
+running `AcceptorInputHandler`, which listens to messages from the specified
+Proposer. If it's connected to 3 Proposers, there'll be 3 `AcceptorInputHandler` threads.
+
+It sends out PROMISE message as a response to the PREPARE message
+if the Acceptor promises the proposed ID, and sends out ACCEPT message as a response
+to the REQUEST_ACCEPT message if it accepts the proposed ID. When it receives
+a DECIDE message, update the accepted ID and value arbitrarily, and the Acceptor
+now officially vote for the accepted value.
+
+### Proposer
+`Proposer` is a deprived class of `Acceptor`; therefore, it can vote for other
+Proposers as described in the Acceptor role. For its Proposer role, it has a
+`ProposerInputHandler` thread for each Acceptor connecting to it, and a 
+`ProposerOutputHandler` thread to send messages to all or most of the Acceptors.
+If there're 5 Acceptors, there'll be 5 `ProposerInputHandler` threads and 1 `ProposerOutputhanlder` thread.
+
+The `ProposerInputHandler` will push the message from the Acceptor to an array of messages
+of the same type mapping to the proposal ID.
+
+The `ProposerOutputHandler` on the other hand, will send PREPARE messages to all Acceptors upon the
+thread is started. It retrieves the map as processed in `ProposerInputHandler`
+to count the majority of the messages responding to the proposal ID.
+If the majority promise, continue by sending REQUEST_ACCEPT to the promised
+Acceptors. Once the majority accept, send DECIDE messages to all.
+

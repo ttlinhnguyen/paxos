@@ -7,19 +7,21 @@ import java.util.concurrent.*;
 
 public class Acceptor implements Runnable {
     boolean DEBUG = true;
+
     int UUID;
     int port;
-    int delay;
-
+    int delay; // The response delay time in milliseconds
     boolean running = true;
 
+    ServerSocket serverSocket;
+    ExecutorService threadPool;
+    Semaphore lock;
+
+    // Paxos variables for Acceptor roles
     int highestPromiseId = -1;
     int acceptedId = -1;
     int acceptedValue = -1;
     boolean accepted = false;
-    ServerSocket serverSocket;
-    ExecutorService threadPool;
-    Semaphore lock;
 
     /**
      * Constructor for the acceptor role.
@@ -46,6 +48,11 @@ public class Acceptor implements Runnable {
             e.printStackTrace();
         }
     }
+
+    /**
+     * Pause handling messages in a specified time.
+     * @param time pausing time in milliseconds
+     */
     public void pause(int time) {
         running = false;
         try {

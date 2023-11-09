@@ -9,11 +9,20 @@ import java.net.Socket;
 class ProposerInputHandler implements Runnable {
     Proposer proposer;
     Socket acceptorSocket;
+
+    /**
+     * Handles messages from a specified Acceptor.
+     * @param proposer The Proposer itself
+     * @param acceptorSocket The socket of the Acceptor it's listening to
+     */
     public ProposerInputHandler(Proposer proposer, Socket acceptorSocket) {
         this.proposer = proposer;
         this.acceptorSocket = acceptorSocket;
     }
 
+    /**
+     * While it's not stopped, listen to and handle incoming messages from a specified Acceptor.
+     */
     @Override
     public void run() {
         try {
@@ -33,6 +42,10 @@ class ProposerInputHandler implements Runnable {
     }
 
 
+    /**
+     * Stores the PROMISE message according to the proposal ID
+     * @param message The PROMISE message from the Acceptor
+     */
     private void receivePromise(Promise message) throws IOException {
         try {
             proposer.lock.acquire();
@@ -41,6 +54,11 @@ class ProposerInputHandler implements Runnable {
             proposer.lock.release();
         } catch (InterruptedException ignored) {}
     }
+
+    /**
+     * Stores the ACCEPT message according to the proposal ID
+     * @param message The ACCEPT message from the Acceptor
+     */
     private void receiveAccept(Accept message) {
         proposer.acceptedMap.get(message.acceptedId).add(message);
     }

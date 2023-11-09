@@ -16,6 +16,10 @@ class ProposerOutputHandler implements Callable<Boolean> {
         this.proposer = proposer;
     }
 
+    /**
+     * Return the result of the proposal
+     * @return {@code true} if proposed successfully
+     */
     @Override
     public Boolean call() {
         try {
@@ -25,6 +29,9 @@ class ProposerOutputHandler implements Callable<Boolean> {
         }
     }
 
+    /**
+     * Get a new proposal ID that are distinct from any other proposal IDs that have been used by other Proposers
+     */
     private void getNewProposalId() {
         proposer.clock.increment();
         proposalId = proposer.clock.get();
@@ -33,6 +40,10 @@ class ProposerOutputHandler implements Callable<Boolean> {
         proposer.promisedSockets.put(proposalId, new ArrayList<>());
     }
 
+    /**
+     * Sends a PREPARE messages to other members if itself hasn't accepted any other value.
+     * @return {@code true} if proposed successfully.
+     */
     private boolean prepare() throws Exception {
         if (!proposer.accepted && proposer.running) {
             getNewProposalId();
@@ -47,11 +58,15 @@ class ProposerOutputHandler implements Callable<Boolean> {
         return false;
     }
 
+    /**
+     * Sends a REQUEST_ACCEPT message to member that has promised if itself hasn't accepted any other value
+     * @return {@code true} if proposed successfully.
+     */
     private boolean requestAccept() throws Exception {
         if (!proposer.accepted && proposer.running) {
             Thread.sleep(proposer.delay);
             Message request = new RequestAccept(proposalId, proposalValue);
-            proposer.debug(proposer.UUID + " SEND_ACCEPT ID: " + proposalId + " VALUE: " + proposalValue);
+            proposer.debug(proposer.UUID + " REQUEST_ACCEPT ID: " + proposalId + " VALUE: " + proposalValue);
 
             try {
                 proposer.lock.acquire();
@@ -66,6 +81,10 @@ class ProposerOutputHandler implements Callable<Boolean> {
         return false;
     }
 
+    /**
+     * Sends a DECIDE message to all members
+     * @return {@code true} if proposed successfully.
+     */
     private boolean decide() throws Exception {
         if (proposer.running) {
             Thread.sleep(proposer.delay);
@@ -80,6 +99,11 @@ class ProposerOutputHandler implements Callable<Boolean> {
         return false;
     }
 
+    /**
+     * If the majority promises, go to the REQUEST_ACCEPT stage. If there is not enough promise, timeout after 5s
+     * and send a new proposal (PREPARE stage).
+     * @return {@code true} if proposed successfully.
+     */
     private boolean handlePromise() throws Exception {
         // promise to self
         int majorityTarget =  proposer.promise(proposalId) ? proposer.numAcceptors/2 : proposer.numAcceptors/2+1;
@@ -103,6 +127,10 @@ class ProposerOutputHandler implements Callable<Boolean> {
         return prepare();
     }
 
+    /**
+     * If the majority accepts, go to the DECIDE stage. Otherise, timeout after 5s and sends a new proposal (PREPARE stage)
+     * @return {@code true} if proposed successfully.
+     */
     private boolean handleAccept() throws Exception {
         // accept to self
         int majorityTarget = proposer.accept(proposalId, proposalValue) ? proposer.numAcceptors/2 : proposer.numAcceptors/2+1;
@@ -113,7 +141,7 @@ class ProposerOutputHandler implements Callable<Boolean> {
                 return decide();
             }
         }
-        return false;
+        return prepare();
     }
 
     private boolean notTimeout(long startTime) {

@@ -7,7 +7,6 @@
     <list default="true" id="6aad671c-fc88-471e-b111-597d36990cfd" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/Controller.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Controller.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/members/Acceptor.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/members/Acceptor.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/members/AcceptorInputHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/members/AcceptorInputHandler.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/members/Proposer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/members/Proposer.java" afterDir="false" />
@@ -77,7 +76,7 @@
       <updated>1697689644494</updated>
       <workItem from="1697689645393" duration="6000" />
       <workItem from="1698725266560" duration="58325000" />
-      <workItem from="1699489349854" duration="9633000" />
+      <workItem from="1699489349854" duration="13629000" />
     </task>
     <servers />
   </component>
